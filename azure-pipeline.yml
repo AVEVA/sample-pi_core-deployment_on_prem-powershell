@@ -5,7 +5,7 @@ trigger:
       - master
   paths:
     include:
-      - '/PI-System-Deployment-Samples/OnPrem'
+      - '/'
 
 pr:
   branches:
@@ -13,7 +13,7 @@ pr:
       - master
   paths:
     include:
-      - '/PI-System-Deployment-Samples/OnPrem'
+      - '/'
 
 schedules:
   - cron: '0 0 * * 0'
@@ -23,10 +23,17 @@ schedules:
         - master
     always: true
 
+resources:
+  repositories:
+  - repository: templates
+    type: github
+    name: osisoft/OSI-Samples
+    endpoint: osisoft/OSI-Samples
+
 variables:
-  - template: '/miscellaneous/build_templates/variables.yml'
+  - template: '/miscellaneous/build_templates/variables.yml@templates'
   - name: projPath
-    value: '/PI-System-Deployment-Samples/OnPrem'
+    value: '/'
   - name: analysisProject
     value: Deployment_OnPrem
 
@@ -117,7 +124,7 @@ jobs:
             --detect.bom.aggregate.name="bom_$(analysisProject)_$(Build.SourceBranchName)_7-Zip"
         displayName: 'Synopsys: Detect (7-Zip)'
 
-  - template: '/miscellaneous/build_templates/analysis.yml'
+  - template: '/miscellaneous/build_templates/analysis.yml@templates'
     parameters:
       language: powershell
       skipPolaris: true
