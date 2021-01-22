@@ -90,6 +90,6 @@ The test script is intended for use in the automated test pipeline, but can also
 
 ---
 
-For the PI System Deployment Samples landing page [ReadMe](../)  
-For the main PI System page [ReadMe](../../)  
-For the main OSIsoft Samples page [ReadMe](https://github.com/osisoft/OSI-Samples)
+For the main PI System deployment samples page on master [ReadMe](https://github.com/osisoft/OSI-Samples-PI-System/tree/master/docs/PI-Core-Deployment-Docs)  
+For the main OMF samples page on master [ReadMe](https://github.com/osisoft/OSI-Samples-OMF)  
+For the main OSIsoft samples page on master [ReadMe](https://github.com/osisoft/OSI-Samples)
