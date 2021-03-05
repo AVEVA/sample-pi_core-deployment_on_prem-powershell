@@ -2,38 +2,30 @@ trigger:
   batch: true
   branches:
     include:
-      - master
-  paths:
-    include:
-      - '/'
+      - main
 
 pr:
   branches:
     include:
-      - master
-  paths:
-    include:
-      - '/'
+      - main
 
 schedules:
   - cron: '0 0 * * 0'
     displayName: Weekly build
     branches:
       include:
-        - master
+        - main
     always: true
 
 resources:
   repositories:
-  - repository: templates
-    type: github
-    name: osisoft/OSI-Samples
-    endpoint: osisoft/OSI-Samples
+    - repository: templates
+      type: github
+      name: osisoft/OSI-Samples
+      endpoint: osisoft/OSI-Samples
 
 variables:
   - template: '/miscellaneous/build_templates/variables.yml@templates'
-  - name: projPath
-    value: '/'
   - name: analysisProject
     value: Deployment_OnPrem
 
@@ -73,7 +65,7 @@ jobs:
 
       - task: CopyFiles@2
         inputs:
-          sourceFolder: $(Build.SourcesDirectory)$(projPath)
+          sourceFolder: $(Build.SourcesDirectory)
           contents: '*.ps1'
           targetFolder: '\\$(vmName)\C$\Test'
         displayName: 'Copy PowerShell script'
@@ -108,23 +100,11 @@ jobs:
         displayName: 'SCVMM: Stop VM'
         condition: always()
 
-  - job: BlackDuck
+  - job: Analysis
     pool:
       name: 00-OSIManaged-Test
       demands: COMPUTERNAME -equals $(buildAgent)
     steps:
-      - task: synopsys-detect.synopsys-detect.synopsys-detect-task.SynopsysDetectTask@2
-        inputs:
-          Products: BD
-          BlackDuckService: 'product-readiness.BlackDuck'
-          DetectArguments: |
-            --detect.project.name="product-readiness.$(analysisProject)"
-            --detect.project.version.name="$(Build.SourceBranchName)"
-            --detect.binary.scan.file.path="C:\Program Files\7-Zip\7-Zip.zip"
-            --detect.bom.aggregate.name="bom_$(analysisProject)_$(Build.SourceBranchName)_7-Zip"
-        displayName: 'Synopsys: Detect (7-Zip)'
-
-  - template: '/miscellaneous/build_templates/analysis.yml@templates'
-    parameters:
-      language: powershell
-      skipPolaris: true
+      - template: '/miscellaneous/build_templates/analysis.yml@templates'
+        parameters:
+          skipPolaris: true

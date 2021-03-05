@@ -1,8 +1,8 @@
 # On-Premise PI Server Install PowerShell Sample
 
-**Version:** 1.0.0
+**Version:** 1.0.2
 
-[![Build Status](https://dev.azure.com/osieng/engineering/_apis/build/status/product-readiness/PI-System/osisoft.sample-pi_core-pi_core_deployment-on_prem?repoName=osisoft%2Fsample-pi_core-pi_core_deployment-on_prem&branchName=master)](https://dev.azure.com/osieng/engineering/_build/latest?definitionId=2661&repoName=osisoft%2Fsample-pi_core-pi_core_deployment-on_prem&branchName=master)
+[![Build Status](https://dev.azure.com/osieng/engineering/_apis/build/status/product-readiness/PI-System/osisoft.sample-pi_core-pi_core_deployment-on_prem?repoName=osisoft%2Fsample-pi_core-pi_core_deployment-on_prem&branchName=main)](https://dev.azure.com/osieng/engineering/_build/latest?definitionId=2661&repoName=osisoft%2Fsample-pi_core-pi_core_deployment-on_prem&branchName=main)
 
 This sample uses PowerShell to install Microsoft SQL Server Express, the PI Server including PI Data Archive and PI AF Server, and/or a generic self-extracting PI install kit. The script only installs the packages that are specified by flags, so it can be used to run all three installs or only one.
 
@@ -90,6 +90,6 @@ The test script is intended for use in the automated test pipeline, but can also
 
 ---
 
-For the main PI System deployment samples page on master [ReadMe](https://github.com/osisoft/OSI-Samples-PI-System/tree/master/docs/PI-Core-Deployment-Docs)  
-For the main OMF samples page on master [ReadMe](https://github.com/osisoft/OSI-Samples-OMF)  
-For the main OSIsoft samples page on master [ReadMe](https://github.com/osisoft/OSI-Samples)
+For the main PI System deployment samples page [ReadMe](https://github.com/osisoft/OSI-Samples-PI-System/tree/main/docs/PI-Core-Deployment-Docs)  
+For the main OMF samples page [ReadMe](https://github.com/osisoft/OSI-Samples-OMF)  
+For the main OSIsoft samples page [ReadMe](https://github.com/osisoft/OSI-Samples)
