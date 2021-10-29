@@ -38,8 +38,8 @@ jobs:
         windows10:
           vmName: PRGPSDWIN10
     pool:
-      name: 00-OSIManaged-Test
-      demands: COMPUTERNAME -equals $(buildAgent)
+      name: 00-OSIManaged-Containers
+      demands: Agent.OS -equals Windows_NT
     steps:
       - task: ms-vscs-rm.scvmmapp.scvmmresourcedeployment-task.SCVMM@1
         inputs:
@@ -102,8 +102,8 @@ jobs:
 
   - job: Analysis
     pool:
-      name: 00-OSIManaged-Test
-      demands: COMPUTERNAME -equals $(buildAgent)
+      name: 00-OSIManaged-Containers
+      demands: Agent.OS -equals Windows_NT
     steps:
       - template: '/miscellaneous/build_templates/analysis.yml@templates'
         parameters:
