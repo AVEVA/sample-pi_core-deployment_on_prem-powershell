@@ -62,12 +62,23 @@ jobs:
           CreateBoundaryVM: false
           NoDetailedLogs: false
         displayName: 'SCVMM: Start VM'
-        
+      
+      # Download secrets from Azure Key Vault
+      - task: AzureKeyVault@2
+        inputs:
+          azureSubscription: '$(azureSubscription)'
+          KeyVaultName: 'Github-Samples'
+          SecretsFilter: 'Username, Password'
+          RunAsPreJob: false
+        condition: ne('${{ parameters.secrets }}', '')
+      
       - task: WindowsMachineFileCopy@2
         inputs:
           sourcePath: $(Build.SourcesDirectory)
           machineNames: $(vmName)
           targetPath: 'C:\Test'
+          adminUserName: $(Username)
+          adminPassword: $(Password)
         displayName: 'Copy PowerShell script'
 
       - task: PowerShellOnTargetMachines@3
