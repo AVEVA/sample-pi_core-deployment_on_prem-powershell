@@ -62,12 +62,11 @@ jobs:
           CreateBoundaryVM: false
           NoDetailedLogs: false
         displayName: 'SCVMM: Start VM'
-
-      - task: CopyFiles@2
+        
+      - task: WindowsMachineFileCopy@2
         inputs:
-          sourceFolder: $(Build.SourcesDirectory)
-          contents: '*.ps1'
-          targetFolder: '\\$(vmName)\C$\Test'
+          sourcePath: $(Build.SourcesDirectory)
+          targetPath: '\\$(vmName)\C$\Test'
         displayName: 'Copy PowerShell script'
 
       - task: PowerShellOnTargetMachines@3
