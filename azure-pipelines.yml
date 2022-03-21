@@ -68,7 +68,7 @@ jobs:
         inputs:
           azureSubscription: '$(azureSubscription)'
           KeyVaultName: 'Github-Samples'
-          SecretsFilter: 'Username2, Password2'
+          SecretsFilter: 'Username3, Password3'
           RunAsPreJob: false
       
       - task: WindowsMachineFileCopy@2
