@@ -88,7 +88,6 @@ jobs:
           scriptArguments: '-sql .\SQL\SETUP.EXE -piserver .\PIServer.exe -pilicdir C:\Test -afdatabase TestDatabase -pibundle .\PIProcessBook.exe -remote'
           workingDirectory: 'C:\Test'
           communicationProtocol: 'http'
-          authenticationMechanism: 'credssp'
           userName: .\$(Username2)
           userPassword: $(Password2)
         displayName: 'Run PowerShell script'
