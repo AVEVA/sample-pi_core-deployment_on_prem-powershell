@@ -76,20 +76,20 @@ jobs:
           sourcePath: $(Build.SourcesDirectory)
           machineNames: $(vmName)
           targetPath: 'C:\Test'
-          adminUserName: $(Username2)
-          adminPassword: $(Password2)
+          adminUserName: $(Username3)
+          adminPassword: $(Password3)
         displayName: 'Copy PowerShell script'
 
       - task: PowerShellOnTargetMachines@3
         inputs:
           machines: $(vmName)
+          communicationProtocol: http
           scriptType: filePath
           scriptPath: 'C:\Test\Install-PIServer.ps1'
           scriptArguments: '-sql .\SQL\SETUP.EXE -piserver .\PIServer.exe -pilicdir C:\Test -afdatabase TestDatabase -pibundle .\PIProcessBook.exe -remote'
           workingDirectory: 'C:\Test'
-          communicationProtocol: 'http'
-          userName: .\$(Username2)
-          userPassword: $(Password2)
+          userName: $(Username3)
+          userPassword: $(Password3)
         displayName: 'Run PowerShell script'
 
       - task: PowerShellOnTargetMachines@3
@@ -98,8 +98,8 @@ jobs:
           communicationProtocol: http
           scriptType: filePath
           scriptPath: 'C:\Test\Verify-PIServer.ps1'
-          userName: .\$(Username2)
-          userPassword: $(Password2)
+          userName: $(Username3)
+          userPassword: $(Password3)
         displayName: 'Run tests'
 
       - task: ms-vscs-rm.scvmmapp.scvmmresourcedeployment-task.SCVMM@1
