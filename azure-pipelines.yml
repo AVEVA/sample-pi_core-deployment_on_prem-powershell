@@ -88,7 +88,7 @@ jobs:
           scriptPath: 'C:\Test\Install-PIServer.ps1'
           scriptArguments: '-sql .\SQL\SETUP.EXE -piserver .\PIServer.exe -pilicdir C:\Test -afdatabase TestDatabase -pibundle .\PIProcessBook.exe -remote'
           workingDirectory: 'C:\Test'
-          userName: .\$(Username2)
+          userName: .\$(Username)
           userPassword: $(Password2)
         displayName: 'Run PowerShell script'
 
@@ -98,7 +98,7 @@ jobs:
           communicationProtocol: http
           scriptType: filePath
           scriptPath: 'C:\Test\Verify-PIServer.ps1'
-          userName: .\$(Username2)
+          userName: .\$(Username)
           userPassword: $(Password2)
         displayName: 'Run tests'
 
