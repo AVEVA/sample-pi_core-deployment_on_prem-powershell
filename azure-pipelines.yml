@@ -114,11 +114,8 @@ jobs:
         displayName: 'SCVMM: Stop VM'
         condition: always()
 
-  - job: Analysis
-    pool:
-      name: 00-OSIManaged-Containers
-      demands: Agent.OS -equals Windows_NT
-    steps:
-      - template: '/miscellaneous/build_templates/analysis.yml@templates'
-        parameters:
-          skipPolaris: true
+  - template: '/miscellaneous/build_templates/code-analysis.yml@templates'
+    parameters:
+      skipPolaris: true
+      buildSteps:
+        - template: '/miscellaneous/build_templates/analysis.yml@templates'
