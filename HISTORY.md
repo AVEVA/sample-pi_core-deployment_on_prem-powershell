@@ -3,6 +3,7 @@
 ## 1.0.4 / 2022-03-22
 
 - Changed agent used in pipeline
+- Use internal code analysis template
 
 ## 1.0.3 / 2021-09-29
 
