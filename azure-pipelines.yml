@@ -70,7 +70,6 @@ jobs:
           KeyVaultName: 'Github-Samples'
           SecretsFilter: 'Username, Password'
           RunAsPreJob: false
-        condition: ne('${{ parameters.secrets }}', '')
       
       - task: WindowsMachineFileCopy@2
         inputs:
