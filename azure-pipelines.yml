@@ -42,8 +42,8 @@ jobs:
         windows10:
           vmName: PRGPSDWIN10
     pool:
-      name: 00-OSIManaged-Test
-      demands: COMPUTERNAME -equals $(buildAgent)
+      name: 00-OSIManaged-Containers
+      demands: Agent.OS -equals Windows_NT
     steps:
       - task: ms-vscs-rm.scvmmapp.scvmmresourcedeployment-task.SCVMM@1
         inputs:
@@ -66,12 +66,22 @@ jobs:
           CreateBoundaryVM: false
           NoDetailedLogs: false
         displayName: 'SCVMM: Start VM'
-
-      - task: CopyFiles@2
+      
+      # Download secrets from Azure Key Vault
+      - task: AzureKeyVault@2
         inputs:
-          sourceFolder: $(Build.SourcesDirectory)
-          contents: '*.ps1'
-          targetFolder: '\\$(vmName)\C$\Test'
+          azureSubscription: '$(azureSubscription)'
+          KeyVaultName: 'Github-Samples'
+          SecretsFilter: 'Username3, Password3'
+          RunAsPreJob: false
+      
+      - task: WindowsMachineFileCopy@2
+        inputs:
+          sourcePath: $(Build.SourcesDirectory)
+          machineNames: $(vmName)
+          targetPath: 'C:\Test'
+          adminUserName: $(Username3)
+          adminPassword: $(Password3)
         displayName: 'Copy PowerShell script'
 
       - task: PowerShellOnTargetMachines@3
@@ -82,6 +92,8 @@ jobs:
           scriptPath: 'C:\Test\Install-PIServer.ps1'
           scriptArguments: '-sql .\SQL\SETUP.EXE -piserver .\PIServer.exe -pilicdir C:\Test -afdatabase TestDatabase -pibundle .\PIProcessBook.exe -remote'
           workingDirectory: 'C:\Test'
+          userName: $(Username3)
+          userPassword: $(Password3)
         displayName: 'Run PowerShell script'
 
       - task: PowerShellOnTargetMachines@3
@@ -90,6 +102,8 @@ jobs:
           communicationProtocol: http
           scriptType: filePath
           scriptPath: 'C:\Test\Verify-PIServer.ps1'
+          userName: $(Username3)
+          userPassword: $(Password3)
         displayName: 'Run tests'
 
       - task: ms-vscs-rm.scvmmapp.scvmmresourcedeployment-task.SCVMM@1

@@ -1,6 +1,6 @@
 # On-Premise PI Server Install PowerShell Sample
 
-**Version:** 1.0.4
+**Version:** 1.0.5
 
 [![Build Status](https://dev.azure.com/osieng/engineering/_apis/build/status/product-readiness/PI-System/osisoft.sample-pi_core-deployment_on_prem-powershell?repoName=osisoft%2Fsample-pi_core-deployment_on_prem-powershell&branchName=main)](https://dev.azure.com/osieng/engineering/_build/latest?definitionId=3087&repoName=osisoft%2Fsample-pi_core-deployment_on_prem-powershell&branchName=main)
 
