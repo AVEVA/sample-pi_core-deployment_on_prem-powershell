@@ -135,7 +135,7 @@ function Confirm-System() {
     Write-LogFunctionExit $func
 }
 
-function Confirm-Param-Set($sql, $piserver, pidrive, $pilicdir, $pibundle, $silentini) {
+function Confirm-ParamSet($sql, $piserver, $pidrive, $pilicdir, $pibundle, $silentini) {
     $func = "Confirm-Param-Set"
     Write-LogFunctionEnter $func
 
@@ -352,8 +352,9 @@ function Install-PIServer($piserver, $pilicdir, $sql, $dryRun) {
     Write-LogFunctionExit $func $fTime.Elapsed.ToString()
 }
 
-function Update-Environment($dryRun) {
+function Update-Environment {
     [CmdletBinding(SupportsShouldProcess = $true)]
+    param($dryRun)
 
     $func = "Update-Environment"
     Write-LogFunctionEnter $func
@@ -469,7 +470,7 @@ function Install-PIBundle($pibundle, $dryRun) {
 #region Main Script Body
 Write-Log "Checking system and script parameters"
 Confirm-System
-Confirm-Param-Set($sql, $piserver, pidrive, $pilicdir, $pibundle, $silentini)
+Confirm-ParamSet($sql, $piserver, $pidrive, $pilicdir, $pibundle, $silentini)
 Write-Log ""
 
 # Run SQL Server Express Install
