@@ -120,13 +120,13 @@ function Confirm-System() {
     Write-LogFunction $func "Checking System Compatibility..."
 
     # Check that this is a 64-bit system
-    $bitness = (Get-WmiObject Win32_OperatingSystem).OSArchitecture
+    $bitness = (Get-CimInstance Win32_OperatingSystem).OSArchitecture
     if ($bitness -NotLike "*64*") {
         Write-LogFunctionError $func "Operating System not supported. This script is intended for 64 bit systems only."
     }
 
     # Check that this is Windows major version 10
-    $osVersion = (Get-WmiObject Win32_OperatingSystem).Version
+    $osVersion = (Get-CimInstance Win32_OperatingSystem).Version
     if (-not ($osVersion -like "10.0*")) {
         Write-LogFunctionError $func "Operating system not supported. This script is intended for Windows Server 2016 or Windows 10 systems only."
     }
@@ -166,7 +166,7 @@ function Confirm-Params() {
         if ($pidrive -ne "") {
             # Specified drive as parameter, check it exists
             $testDrive = "${pidrive}:"
-            if ((Test-Path $testDrive) -and (Get-WmiObject Win32_LogicalDisk -Filter "DeviceID='$testDrive'").DriveType -eq [int]3) {
+            if ((Test-Path $testDrive) -and (Get-CimInstance Win32_LogicalDisk -Filter "DeviceID='$testDrive'").DriveType -eq [int]3) {
                 $PiDirectory = "$testDrive\PI"
             }
             else {
@@ -175,10 +175,10 @@ function Confirm-Params() {
         }
         else {
             # No specified drive, try D: or C:
-            if ((Test-Path D:) -and (Get-WmiObject Win32_LogicalDisk -Filter "DeviceID='D:'").DriveType -eq [int]3) {
+            if ((Test-Path D:) -and (Get-CimInstance Win32_LogicalDisk -Filter "DeviceID='D:'").DriveType -eq [int]3) {
                 $PiDirectory = "D:\PI"
             }
-            elseif ((Test-Path C:) -and (Get-WmiObject Win32_LogicalDisk -Filter "DeviceID='C:'").DriveType -eq [int]3) {
+            elseif ((Test-Path C:) -and (Get-CimInstance Win32_LogicalDisk -Filter "DeviceID='C:'").DriveType -eq [int]3) {
                 $PiDirectory = "C:\PI"
             }
             else {
