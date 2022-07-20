@@ -135,8 +135,8 @@ function Confirm-System() {
     Write-LogFunctionExit $func
 }
 
-function Confirm-Params() {
-    $func = "Confirm-Params"
+function Confirm-Param-Set($sql, $piserver, pidrive, $pilicdir, $pibundle, $silentini) {
+    $func = "Confirm-Param-Set"
     Write-LogFunctionEnter $func
 
     Write-LogFunction $func "Checking Script Parameters..."
@@ -249,7 +249,7 @@ function Confirm-Params() {
     Write-LogFunctionExit $func
 }
 
-function Install-SQLServerExpress() {
+function Install-SQLServerExpress($remote, $sql) {
     $func = "Install-SQLServerExpress"
     Write-LogFunctionEnter $func
 
@@ -294,7 +294,7 @@ function Install-SQLServerExpress() {
     Write-LogFunctionExit $func $fTime.Elapsed.ToString()
 }
 
-function Install-PIServer() {
+function Install-PIServer($piserver, $pilicdir, $sql, $dryRun) {
     $func = "Install-PIServer"
     Write-LogFunctionEnter $func
 
@@ -352,7 +352,9 @@ function Install-PIServer() {
     Write-LogFunctionExit $func $fTime.Elapsed.ToString()
 }
 
-function Update-Environment {
+function Update-Environment($dryRun) {
+    [CmdletBinding(SupportsShouldProcess = $true)]
+
     $func = "Update-Environment"
     Write-LogFunctionEnter $func
 
@@ -390,7 +392,7 @@ function Update-Environment {
     Write-LogFunctionExit $func
 }
 
-function Add-InitialAFDatabase() {
+function Add-InitialAFDatabase($afdatabase, $dryRun) {
     $func = "Add-InitialAFDatabase"
     Write-LogFunctionEnter $func
 
@@ -408,7 +410,7 @@ function Add-InitialAFDatabase() {
     Write-LogFunctionExit $func
 }
 
-function Expand-PIBundle() {
+function Expand-PIBundle($pibundle, $dryRun) {
     $func = "Expand-PIBundle"
     Write-LogFunctionEnter $func
 
@@ -432,7 +434,7 @@ function Expand-PIBundle() {
     Write-LogFunctionExit $func
 }
 
-function Install-PIBundle() {
+function Install-PIBundle($pibundle, $dryRun) {
     $func = "Install-PIBundle"
     Write-LogFunctionEnter $func
 
@@ -467,13 +469,13 @@ function Install-PIBundle() {
 #region Main Script Body
 Write-Log "Checking system and script parameters"
 Confirm-System
-Confirm-Params
+Confirm-Param-Set($sql, $piserver, pidrive, $pilicdir, $pibundle, $silentini)
 Write-Log ""
 
 # Run SQL Server Express Install
 if ($sql -ne "") {
     Write-Log "-sql flag specified, starting SQL Server Express Install"
-    Install-SQLServerExpress
+    Install-SQLServerExpress($remote, $sql)
 }
 else {
     Write-Log "-sql flag not specified, skipping SQL Server Express Install"
@@ -483,10 +485,10 @@ Write-Log ""
 # Run PI Server Install
 if ($piserver -ne "") {
     Write-Log "-piserver flag specified, starting PI Server Install"
-    Install-PIServer
-    Update-Environment
+    Install-PIServer($piserver, $pilicdir, $sql, $dryRun)
+    Update-Environment($dryRun)
     if ($afdatabse -ne "") {
-        Add-InitialAFDatabase
+        Add-InitialAFDatabase($afdatabase, $dryRun)
     }
 }
 else {
@@ -497,8 +499,8 @@ Write-Log ""
 # Run PI Bundle Install
 if ($pibundle -ne "") {
     Write-Log "-pibundle flag specified, starting PI Bundle Install"
-    Expand-PIBundle
-    Install-PIBundle
+    Expand-PIBundle($pibundle, $dryRun)
+    Install-PIBundle($pibundle, $dryRun)
 }
 else {
     Write-Log "-pibundle flag not specified, skipping PI Bundle Install"
