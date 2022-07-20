@@ -117,6 +117,18 @@ jobs:
           NoDetailedLogs: false
         displayName: 'SCVMM: Stop VM'
         condition: always()
+  
+  - job: Code_Analysis
+    pool:
+      name: 00-OSIManaged-Containers
+      demands: Agent.OS -equals Windows_NT
+    steps:
+      - powershell: Install-Module -Name PSScriptAnalyzer -Force
+        displayName: Install code analyzer
+        
+      - powershell: Invoke-ScriptAnalyzer -EnableExit -Path ./ -Recurse
+        failOnStderr: true
+        displayName: Run analysis
 
   - template: '/miscellaneous/build_templates/code-analysis.yml@templates'
     parameters:
