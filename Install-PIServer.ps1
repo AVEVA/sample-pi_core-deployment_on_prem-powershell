@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
 	Installs the PI Server on Windows Server 2016 or Windows 10, 64-bit architecture only.
-	
+
 .DESCRIPTION
-	Installs SQL Server Express, PI Server, and optional PI Connector and performs configuration tasks.	
+	Installs SQL Server Express, PI Server, and optional PI Connector and performs configuration tasks.
 	Only components whose installers are passed as parameters are installed.
 
 .PARAMETERS
@@ -16,7 +16,7 @@
 
 .PARAMETER pilicdir
     Specifies the directory containing the pilicense.dat file. Defaults to the local directory.
-    
+
 .PARAMETER pidrive
     Specifies the drive letter to use for PI Archive/Queue files. Defaults to D:\, or C:\ if no D:\ is found.
 
@@ -40,13 +40,13 @@
 
 .EXAMPLE
 	> .\Install-PIServer.ps1 -sql C:\Kits\SQL\Setup.exe -piserver C:\Kits\PI\PI-Server.exe -pibundle C:\Kits\PI\PIProcessBook.exe
-	
+
     Installs Microsoft SQL Server Express, installs PI Server 'typical' components (including PI Data Archive and PI AF Server),
     and installs PI ProcessBook using its self-extracting install kit.
 
 .EXAMPLE
 	> .\Install-PIServer.ps1 -sql C:\Kits\SQL\Setup.exe
-	
+
 	Installs Microsoft SQL Server Express only.
 
 .NOTES
@@ -252,13 +252,13 @@ function Confirm-Params() {
 function Install-SQLServerExpress() {
     $func = "Install-SQLServerExpress"
     Write-LogFunctionEnter $func
- 
+
     $fTime = [System.Diagnostics.Stopwatch]::StartNew()
 
     Write-LogFunction $func "Installing Microsoft SQL Server Express..."
     Write-LogFunction $func "Using install kit: '$sql'"
 
-    $params = 
+    $params =
     @(
         "/Q",
         "/IACCEPTSQLSERVERLICENSETERMS=TRUE",
@@ -279,7 +279,7 @@ function Install-SQLServerExpress() {
         Write-LogFunction $func "Starting install..."
         # Begin install attempt using defined parameters
         $rc = Start-Process -FilePath $sql -ArgumentList $params -Wait -PassThru
-    
+
         if (($rc.ExitCode -ne 0) -and ($rc.ExitCode -ne 3010)) {
             # 3010 means ok, but need to reboot
             Write-LogFunctionError $func "Microsoft SQL Server Express Installation failed with error code: $($rc.ExitCode)"
@@ -297,7 +297,7 @@ function Install-SQLServerExpress() {
 function Install-PIServer() {
     $func = "Install-PIServer"
     Write-LogFunctionEnter $func
-	
+
     $fTime = [System.Diagnostics.Stopwatch]::StartNew()
 
     Write-LogFunction $func "Installing PI Server..."
@@ -333,11 +333,11 @@ function Install-PIServer() {
         "PI_ARCHIVESIZE=256",
         "PI_AUTOCREATEARCHIVES=1"
     )
-   
+
     if ($dryRun -ne $true) {
         Write-LogFunction $func "Starting install..."
         $rc = Start-Process $piserver -ArgumentList $params -Wait -PassThru -NoNewWindow
-    
+
         if (($rc.ExitCode -ne 0) -and ($rc.ExitCode -ne 3010)) {
             # 3010 means ok, but need to reboot
             Write-LogFunctionError $func "PI Server Installation failed with error code: $($rc.ExitCode)"
@@ -438,7 +438,7 @@ function Install-PIBundle() {
 
     $fTime = [System.Diagnostics.Stopwatch]::StartNew()
 
-    Write-LogFunction $func "Installing PI setup kit..."    
+    Write-LogFunction $func "Installing PI setup kit..."
     $baseName = (Get-Item $pibundle).BaseName
     $silentIniPath = $silentini
 
@@ -452,13 +452,13 @@ function Install-PIBundle() {
     }
     else {
         $rc = Start-Process -FilePath ".\$baseName\Setup.exe" -ArgumentList "-f ""$silentIniPath""" -Wait -PassThru -NoNewWindow
-        
+
         if (($rc.ExitCode -ne 0) -and ($rc.ExitCode -ne 3010)) {
             # 3010 means ok, but need to reboot
             Write-LogFunctionError $func "Installing PI setup kit failed with error code: $($rc.ExitCode)"
         }
     }
-	
+
     Write-LogFunction $func "PI setup kit installed"
     Write-LogFunctionExit $func $fTime.Elapsed.ToString()
 }
