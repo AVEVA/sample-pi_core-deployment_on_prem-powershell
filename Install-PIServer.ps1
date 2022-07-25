@@ -470,13 +470,13 @@ function Install-PIBundle($pibundle, $dryRun) {
 #region Main Script Body
 Write-Log "Checking system and script parameters"
 Confirm-System
-Confirm-ParamSet($sql, $piserver, $pidrive, $pilicdir, $pibundle, $silentini)
+Confirm-ParamSet -sql $sql -piserver $piserver -pidrive $pidrive -pilicidir $pilicdir -pibundle $pibundle -silentini $silentini
 Write-Log ""
 
 # Run SQL Server Express Install
 if ($sql -ne "") {
     Write-Log "-sql flag specified, starting SQL Server Express Install"
-    Install-SQLServerExpress($remote, $sql)
+    Install-SQLServerExpress -remote $remote -sql $sql
 }
 else {
     Write-Log "-sql flag not specified, skipping SQL Server Express Install"
@@ -486,10 +486,10 @@ Write-Log ""
 # Run PI Server Install
 if ($piserver -ne "") {
     Write-Log "-piserver flag specified, starting PI Server Install"
-    Install-PIServer($piserver, $pilicdir, $sql, $dryRun)
-    Update-Environment($dryRun)
+    Install-PIServer -piserver $piserver -pilicidir $pilicdir -sql $sql -dryRun $dryRun
+    Update-Environment -dryRun $dryRun
     if ($afdatabse -ne "") {
-        Add-InitialAFDatabase($afdatabase, $dryRun)
+        Add-InitialAFDatabase -afdatabase $afdatabase -dryRun $dryRun
     }
 }
 else {
@@ -500,8 +500,8 @@ Write-Log ""
 # Run PI Bundle Install
 if ($pibundle -ne "") {
     Write-Log "-pibundle flag specified, starting PI Bundle Install"
-    Expand-PIBundle($pibundle, $dryRun)
-    Install-PIBundle($pibundle, $dryRun)
+    Expand-PIBundle -pibundle $pibundle -dryRun $dryRun
+    Install-PIBundle -pibundle $pibundle -dryRun $dryRun
 }
 else {
     Write-Log "-pibundle flag not specified, skipping PI Bundle Install"
