@@ -470,7 +470,7 @@ function Install-PIBundle($pibundle, $dryRun) {
 #region Main Script Body
 Write-Log "Checking system and script parameters"
 Confirm-System
-Confirm-ParamSet -sql $sql -piserver $piserver -pidrive $pidrive -pilicidir $pilicdir -pibundle $pibundle -silentini $silentini
+Confirm-ParamSet -sql $sql -piserver $piserver -pidrive $pidrive -pilicdir $pilicdir -pibundle $pibundle -silentini $silentini
 Write-Log ""
 
 # Run SQL Server Express Install
@@ -486,7 +486,7 @@ Write-Log ""
 # Run PI Server Install
 if ($piserver -ne "") {
     Write-Log "-piserver flag specified, starting PI Server Install"
-    Install-PIServer -piserver $piserver -pilicidir $pilicdir -sql $sql -dryRun $dryRun
+    Install-PIServer -piserver $piserver -pilicdir $pilicdir -sql $sql -dryRun $dryRun
     Update-Environment -dryRun $dryRun
     if ($afdatabse -ne "") {
         Add-InitialAFDatabase -afdatabase $afdatabase -dryRun $dryRun
