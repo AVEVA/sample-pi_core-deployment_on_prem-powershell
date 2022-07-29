@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
 	Installs the PI Server on Windows Server 2016 or Windows 10, 64-bit architecture only.
-	
+
 .DESCRIPTION
-	Installs SQL Server Express, PI Server, and optional PI Connector and performs configuration tasks.	
+	Installs SQL Server Express, PI Server, and optional PI Connector and performs configuration tasks.
 	Only components whose installers are passed as parameters are installed.
 
 .PARAMETERS
@@ -16,7 +16,7 @@
 
 .PARAMETER pilicdir
     Specifies the directory containing the pilicense.dat file. Defaults to the local directory.
-    
+
 .PARAMETER pidrive
     Specifies the drive letter to use for PI Archive/Queue files. Defaults to D:\, or C:\ if no D:\ is found.
 
@@ -40,13 +40,13 @@
 
 .EXAMPLE
 	> .\Install-PIServer.ps1 -sql C:\Kits\SQL\Setup.exe -piserver C:\Kits\PI\PI-Server.exe -pibundle C:\Kits\PI\PIProcessBook.exe
-	
+
     Installs Microsoft SQL Server Express, installs PI Server 'typical' components (including PI Data Archive and PI AF Server),
     and installs PI ProcessBook using its self-extracting install kit.
 
 .EXAMPLE
 	> .\Install-PIServer.ps1 -sql C:\Kits\SQL\Setup.exe
-	
+
 	Installs Microsoft SQL Server Express only.
 
 .NOTES
@@ -120,13 +120,13 @@ function Confirm-System() {
     Write-LogFunction $func "Checking System Compatibility..."
 
     # Check that this is a 64-bit system
-    $bitness = (Get-WmiObject Win32_OperatingSystem).OSArchitecture
+    $bitness = (Get-CimInstance Win32_OperatingSystem).OSArchitecture
     if ($bitness -NotLike "*64*") {
         Write-LogFunctionError $func "Operating System not supported. This script is intended for 64 bit systems only."
     }
 
     # Check that this is Windows major version 10
-    $osVersion = (Get-WmiObject Win32_OperatingSystem).Version
+    $osVersion = (Get-CimInstance Win32_OperatingSystem).Version
     if (-not ($osVersion -like "10.0*")) {
         Write-LogFunctionError $func "Operating system not supported. This script is intended for Windows Server 2016 or Windows 10 systems only."
     }
@@ -135,8 +135,8 @@ function Confirm-System() {
     Write-LogFunctionExit $func
 }
 
-function Confirm-Params() {
-    $func = "Confirm-Params"
+function Confirm-ParamSet($sql, $piserver, $pidrive, $pilicdir, $pibundle, $silentini) {
+    $func = "Confirm-Param-Set"
     Write-LogFunctionEnter $func
 
     Write-LogFunction $func "Checking Script Parameters..."
@@ -166,7 +166,7 @@ function Confirm-Params() {
         if ($pidrive -ne "") {
             # Specified drive as parameter, check it exists
             $testDrive = "${pidrive}:"
-            if ((Test-Path $testDrive) -and (Get-WmiObject Win32_LogicalDisk -Filter "DeviceID='$testDrive'").DriveType -eq [int]3) {
+            if ((Test-Path $testDrive) -and (Get-CimInstance Win32_LogicalDisk -Filter "DeviceID='$testDrive'").DriveType -eq [int]3) {
                 $PiDirectory = "$testDrive\PI"
             }
             else {
@@ -175,10 +175,10 @@ function Confirm-Params() {
         }
         else {
             # No specified drive, try D: or C:
-            if ((Test-Path D:) -and (Get-WmiObject Win32_LogicalDisk -Filter "DeviceID='D:'").DriveType -eq [int]3) {
+            if ((Test-Path D:) -and (Get-CimInstance Win32_LogicalDisk -Filter "DeviceID='D:'").DriveType -eq [int]3) {
                 $PiDirectory = "D:\PI"
             }
-            elseif ((Test-Path C:) -and (Get-WmiObject Win32_LogicalDisk -Filter "DeviceID='C:'").DriveType -eq [int]3) {
+            elseif ((Test-Path C:) -and (Get-CimInstance Win32_LogicalDisk -Filter "DeviceID='C:'").DriveType -eq [int]3) {
                 $PiDirectory = "C:\PI"
             }
             else {
@@ -249,16 +249,16 @@ function Confirm-Params() {
     Write-LogFunctionExit $func
 }
 
-function Install-SQLServerExpress() {
+function Install-SQLServerExpress($remote, $sql) {
     $func = "Install-SQLServerExpress"
     Write-LogFunctionEnter $func
- 
+
     $fTime = [System.Diagnostics.Stopwatch]::StartNew()
 
     Write-LogFunction $func "Installing Microsoft SQL Server Express..."
     Write-LogFunction $func "Using install kit: '$sql'"
 
-    $params = 
+    $params =
     @(
         "/Q",
         "/IACCEPTSQLSERVERLICENSETERMS=TRUE",
@@ -279,7 +279,7 @@ function Install-SQLServerExpress() {
         Write-LogFunction $func "Starting install..."
         # Begin install attempt using defined parameters
         $rc = Start-Process -FilePath $sql -ArgumentList $params -Wait -PassThru
-    
+
         if (($rc.ExitCode -ne 0) -and ($rc.ExitCode -ne 3010)) {
             # 3010 means ok, but need to reboot
             Write-LogFunctionError $func "Microsoft SQL Server Express Installation failed with error code: $($rc.ExitCode)"
@@ -294,10 +294,10 @@ function Install-SQLServerExpress() {
     Write-LogFunctionExit $func $fTime.Elapsed.ToString()
 }
 
-function Install-PIServer() {
+function Install-PIServer($piserver, $pilicdir, $sql, $dryRun) {
     $func = "Install-PIServer"
     Write-LogFunctionEnter $func
-	
+
     $fTime = [System.Diagnostics.Stopwatch]::StartNew()
 
     Write-LogFunction $func "Installing PI Server..."
@@ -333,11 +333,11 @@ function Install-PIServer() {
         "PI_ARCHIVESIZE=256",
         "PI_AUTOCREATEARCHIVES=1"
     )
-   
+
     if ($dryRun -ne $true) {
         Write-LogFunction $func "Starting install..."
         $rc = Start-Process $piserver -ArgumentList $params -Wait -PassThru -NoNewWindow
-    
+
         if (($rc.ExitCode -ne 0) -and ($rc.ExitCode -ne 3010)) {
             # 3010 means ok, but need to reboot
             Write-LogFunctionError $func "PI Server Installation failed with error code: $($rc.ExitCode)"
@@ -353,6 +353,9 @@ function Install-PIServer() {
 }
 
 function Update-Environment {
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    param($dryRun)
+
     $func = "Update-Environment"
     Write-LogFunctionEnter $func
 
@@ -390,7 +393,7 @@ function Update-Environment {
     Write-LogFunctionExit $func
 }
 
-function Add-InitialAFDatabase() {
+function Add-InitialAFDatabase($afdatabase, $dryRun) {
     $func = "Add-InitialAFDatabase"
     Write-LogFunctionEnter $func
 
@@ -408,7 +411,7 @@ function Add-InitialAFDatabase() {
     Write-LogFunctionExit $func
 }
 
-function Expand-PIBundle() {
+function Expand-PIBundle($pibundle, $dryRun) {
     $func = "Expand-PIBundle"
     Write-LogFunctionEnter $func
 
@@ -432,13 +435,13 @@ function Expand-PIBundle() {
     Write-LogFunctionExit $func
 }
 
-function Install-PIBundle() {
+function Install-PIBundle($pibundle, $dryRun) {
     $func = "Install-PIBundle"
     Write-LogFunctionEnter $func
 
     $fTime = [System.Diagnostics.Stopwatch]::StartNew()
 
-    Write-LogFunction $func "Installing PI setup kit..."    
+    Write-LogFunction $func "Installing PI setup kit..."
     $baseName = (Get-Item $pibundle).BaseName
     $silentIniPath = $silentini
 
@@ -452,13 +455,13 @@ function Install-PIBundle() {
     }
     else {
         $rc = Start-Process -FilePath ".\$baseName\Setup.exe" -ArgumentList "-f ""$silentIniPath""" -Wait -PassThru -NoNewWindow
-        
+
         if (($rc.ExitCode -ne 0) -and ($rc.ExitCode -ne 3010)) {
             # 3010 means ok, but need to reboot
             Write-LogFunctionError $func "Installing PI setup kit failed with error code: $($rc.ExitCode)"
         }
     }
-	
+
     Write-LogFunction $func "PI setup kit installed"
     Write-LogFunctionExit $func $fTime.Elapsed.ToString()
 }
@@ -467,13 +470,13 @@ function Install-PIBundle() {
 #region Main Script Body
 Write-Log "Checking system and script parameters"
 Confirm-System
-Confirm-Params
+Confirm-ParamSet -sql $sql -piserver $piserver -pidrive $pidrive -pilicdir $pilicdir -pibundle $pibundle -silentini $silentini
 Write-Log ""
 
 # Run SQL Server Express Install
 if ($sql -ne "") {
     Write-Log "-sql flag specified, starting SQL Server Express Install"
-    Install-SQLServerExpress
+    Install-SQLServerExpress -remote $remote -sql $sql
 }
 else {
     Write-Log "-sql flag not specified, skipping SQL Server Express Install"
@@ -483,10 +486,10 @@ Write-Log ""
 # Run PI Server Install
 if ($piserver -ne "") {
     Write-Log "-piserver flag specified, starting PI Server Install"
-    Install-PIServer
-    Update-Environment
+    Install-PIServer -piserver $piserver -pilicdir $pilicdir -sql $sql -dryRun $dryRun
+    Update-Environment -dryRun $dryRun
     if ($afdatabse -ne "") {
-        Add-InitialAFDatabase
+        Add-InitialAFDatabase -afdatabase $afdatabase -dryRun $dryRun
     }
 }
 else {
@@ -497,8 +500,8 @@ Write-Log ""
 # Run PI Bundle Install
 if ($pibundle -ne "") {
     Write-Log "-pibundle flag specified, starting PI Bundle Install"
-    Expand-PIBundle
-    Install-PIBundle
+    Expand-PIBundle -pibundle $pibundle -dryRun $dryRun
+    Install-PIBundle -pibundle $pibundle -dryRun $dryRun
 }
 else {
     Write-Log "-pibundle flag not specified, skipping PI Bundle Install"
