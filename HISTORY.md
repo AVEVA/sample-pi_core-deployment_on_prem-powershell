@@ -1,5 +1,9 @@
 # Version History
 
+## 1.0.7 / 2022-08-09
+
+- Remove weekly tests
+
 ## 1.0.6 / 2022-07-22
 
 - Add code analysis to pipeline
